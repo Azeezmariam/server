@@ -5,6 +5,21 @@ const bcrypt = require('bcrypt');
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Enable CORS for all routes
+app.use(cors());
+
+// Express now includes built-in JSON parsing
+app.use(express.json());
+
+// Connect to MongoDB
+mongoose.connect('mongodb+srv://mazeez:Temi@1209@cluster0.ovzhqdk.mongodb.net/trans', { useNewUrlParser: true, useUnifiedTopology: true });
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.once('open', () => {
+    console.log('Connected to MongoDB');
+});
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -24,31 +39,6 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
-
-
-// Enable CORS for all routes
-app.use(cors());
-
-// Express now includes built-in JSON parsing
-app.use(express.json());
-
-// Unified CORS configuration
-app.use(cors({
-    origin: ['http://127.0.0.1:5504', 'http://127.0.0.1:5506'],
-    credentials: true
-}));
-
-
-app.use(express.json());
-
-// Connect to MongoDB
-mongoose.connect('mongodb+srv://mazeez:Temi@1209@cluster0.ovzhqdk.mongodb.net/trans', { useNewUrlParser: true, useUnifiedTopology: true });
-
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-db.once('open', () => {
-    console.log('Connected to MongoDB');
-});
 
 // Registration endpoint
 app.post('/register', async (req, res) => {
@@ -103,9 +93,6 @@ app.post('/login', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
-
-
-
 
 // Start the server
 const PORT = process.env.PORT || 3000;
